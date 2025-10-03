@@ -38,9 +38,13 @@ async def generate(data: GenerateRequest):
     )
 
     # Extract image URLs
-    urls = [img[os.getenv("IMAGE_RESPONSE_FIELD")] for img in result.get(os.getenv("IMAGES_RESPONSE_FIELD"), []) if "url" in os.getenv("IMAGE_RESPONSE_FIELD")]
-    return GenerateResponse(urls=urls)
+    images_field = os.getenv("IMAGES_RESPONSE_FIELD", "images")
+    image_field = os.getenv("IMAGE_RESPONSE_FIELD", "url")
 
+    # Extract image URLs safely
+    urls = [img[image_field] for img in result.get(images_field, [])
+        if image_field in img
+    ]
     return GenerateResponse(urls=urls)
 
 # Run with: uvicorn main:app --reload --port 8087
